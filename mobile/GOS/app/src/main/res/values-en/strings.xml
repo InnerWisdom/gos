@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">GOS</string>
+
+    <!-- Main screen -->
+    <string name="add_task">Add task</string>
+    <string name="report">Report</string>
+    <!-- Task layout -->
+    <string name="edit_task">Edit</string>
+    <!-- Manage task screen -->
+    <string name="task_hint">Enter the task</string>
+    <string name="save">Save</string>
+    <!-- Report screen -->
+    <string name="quantity_report_template">The total number of tasks with a character length greater than 10: %1$d</string>
+</resources>

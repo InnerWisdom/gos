@@ -1,0 +1,345 @@
+using System;
+
+namespace ConsoleApp5
+{
+    class Program
+    {
+        /*Линейное пробирование. Простейший метод открытой адресации называется линейным опробованием (linear probing): 
+        * при возникновении коллизии (когда хеширование дает адрес в таблице, который уже занят элементом с ключом,
+        * не совпадающим с ключом поиска) мы просто проверяем следующую позицию в таблице. Обычно такую проверку 
+        * (определяющую, содержит ли данная позиция таблицы элемент с ключом, равным ключу поиска) называют пробой (probe).
+        * При линейном опробовании определяется один из трех возможных исходов пробы: если позиция таблицы содержит элемент, 
+        * ключ которого совпадает с искомым, то поиск завершился успешно; в противном случае (если позиция таблицы содержит 
+        * элемент, ключ которого не совпадает с искомым) мы просто проверяем позицию таблицы с большим индексом, продолжая 
+        * этот процесс (с возвратом к началу таблицы при достижении ее конца) до тех пор, пока не будет найден искомый ключ 
+        * или пустая позиция таблицы. Если элемент, содержащий искомый ключ, должен быть вставлен после неудачного поиска,
+        * он помещается в пустое место таблицы, где был завершен поиск. */
+
+        class HashElement
+        {
+            private int key;
+            private int value;
+            private bool deleted;
+            //конструктор
+            public HashElement(int key, int value)
+            {
+                this.key = key;
+                this.value = value;
+                deleted = false;
+            }
+            //вычисляем хеш по значению
+            public int hash(int value)
+            {
+                return value % 10;
+            }
+            //сетер на удаление
+            public void setDeleted()
+            {
+                deleted = true;
+            }
+            //гетер на удаление
+            public bool isDeleted()
+            {
+                return deleted;
+            }
+
+            public int getKey()
+            {
+                return key;
+            }
+
+            public int getValue()
+            {
+                return value;
+            }
+        }
+        class HashWithChaining
+        {
+
+            /*Метод-цепоцки. Суть этого метода проста: если хеш-функция выделяет один индекс сразу двум элементам, то храниться они будут 
+             * в одном и том же индексе, но уже с помощью двусвязного списка. */
+
+
+
+            public int SIZE = 10;
+            int[][] table;
+            // Формируем таблицу 
+            public HashWithChaining()
+            {
+                table = new int[SIZE][];
+
+                for (int i = 0; i < table.Length; i++)
+                {
+                    table[i] = new int[10];
+                }
+            }
+            //вычисляем хеш по значению
+            public int hash(int value)
+            {
+                return Math.Abs(value) % SIZE;
+            }
+            // добавление в таблицу и собстна с цепочку
+            public void add(int value)
+            {
+                int code = hash(value);
+                for (int i = 0; i < table[code].Length; i++)
+                {
+                    // находим пустую ячейку в цепочке
+                    if (table[code][i] == 0)
+                    {
+                        table[code][i] = value;
+                        return;
+                    }
+                }
+            }
+            //поиск значения
+            public void find(int value)
+            {
+                //вычисляем хеш
+                int code = hash(value);
+                //находим знначение в методе цепочек
+                for (int i = 0; i < table[code].Length; i++)
+                {
+                    if (table[code][i].Equals(value))
+                    {
+                        Console.WriteLine("Найден элемент: code: " + code + " i: " + i + " value: " + value);
+                        return;
+                    }
+                }
+                Console.WriteLine("Не нашли");
+            }
+            // Удаление ну тут так же по хешу обрааемся в ячейку находим значение и удаляем
+            public bool delete(int value)
+            {
+                int code = hash(value);
+                for (int i = 0; i < table[code].Length; i++)
+                {
+                    if (table[code][i].Equals(value))
+                    {
+                        for (int k = i; k < table[code].Length - 1; k++)
+                        {
+                            table[code][k] = table[code][k + 1];
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+            public void printTable()
+            {
+                for (int i = 0; i < table.Length; i++)
+                {
+                    if (table[i].Length == 0)
+                        continue;
+                    Console.Write(i + " ");
+                    for (int k = 0; k < table[i].Length; k++)
+                    {
+                        if (!table[i][k].Equals(0))
+                        {
+                            Console.Write(table[i][k] + " ");
+                        }
+                    }
+                    Console.WriteLine();
+                }
+            }
+        }
+
+        class Table
+        {
+            public static int SIZE = 100001;
+            private HashElement[] table = new HashElement[SIZE];
+            //вычисление хеша
+            public int hash(int value)
+            {
+                return value % 10;
+            }
+            //Добавление
+            public bool add(int value)
+            {
+                // следующее поле для добавления если первое занято
+                int probe;
+                int code = hash(value);
+                // Добавляем только в пустую ячейку
+                if ((table[code] == null) || table[code].isDeleted())
+                {
+                    table[code] = new HashElement(code, value);
+                    probe = -1;
+                }
+
+                else
+                {
+
+                    if (code == (table.Length - 1))
+                        probe = 0;
+                    else
+                        probe = code + 1;
+                }
+
+
+                // добавление в пробу(след ячейку) 
+                // если ячейка пустая идем дальше пока не найдем пустую
+                while ((probe != -1) && (probe != code))
+                {
+
+                    if ((table[probe] == null) || table[probe].isDeleted())
+                    {
+
+                        table[probe] = new HashElement(code, value);
+                        probe = -1;
+                    }
+
+                    else
+                    {
+                        if (probe == (table.Length - 1))
+                            probe = 0;
+                        else
+                            probe++;
+                    }
+                }
+
+
+                if (probe != -1)
+                    return false;
+                else
+                    return true;
+            }
+
+            // Ищем по хешу и идем дальше что бы найти нужное значение
+            public int find(int value)
+            {
+
+                int probe;
+                int code = hash(value);
+                if (table[code] == null)
+                    return -1;
+
+                else if (table[code].getValue().Equals(value))
+                    return table[code].getValue();
+
+                else
+                {
+
+                    if (code == (table.Length - 1))
+                        probe = 0;
+                    else
+                        probe = code + 1;
+                }
+
+                // если не нашли по хешу идем дальше пока не найдем
+                while ((probe != -1) && (probe != code))
+                {
+                    if (table[probe] == null)
+                        return -1;
+
+                    else if (table[probe].getValue().Equals(value))
+                    {
+                        return table[probe].getValue();
+                    }
+                    else
+                    {
+                        if (probe == (table.Length - 1))
+                            probe = 0;
+                        else
+                            probe++;
+                    }
+                }
+
+
+                return -1;
+            }
+            // ищем по хешу и идем дальше пока не найдем наше значение
+            public bool delete(int value)
+            {
+
+                int probe;
+                int code = hash(value);
+                if (table[code] == null)
+                {
+                    return false;
+                }
+                else if (table[code].getValue().Equals(value))
+                {
+                    table[code].setDeleted();
+                    probe = -1;
+                    return true;
+                }
+                else
+                {
+                    if (code == (table.Length - 1))
+                    {
+                        probe = 0;
+                    }
+                    else
+                    {
+                        probe = code + 1;
+                    }
+                }
+
+                // если не нашли по хешу идем дальше пока не найдем
+
+                while ((probe != -1) && (probe != code))
+                {
+
+                    if (table[probe] == null)
+                    {
+                        return false;
+                    }
+                    else if (table[probe].getValue().Equals(value))
+                    {
+                        table[probe].setDeleted();
+                        probe = -1;
+                        return true;
+                    }
+                    else
+                    {
+                        if (probe == (table.Length - 1))
+                        {
+                            probe = 0;
+                        }
+                        else
+                        {
+                            probe++;
+                        }
+                    }
+                }
+
+
+                return false;
+            }
+
+            public void printTable()
+            {
+                for (int i = 0; i < SIZE; i++)
+                {
+                    if (table[i] != null)
+                    {
+                        if (!table[i].isDeleted())
+                        {
+                            Console.WriteLine(table[i].getValue());
+                        }
+                    }
+                }
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            //метод пробирования
+            Table tb = new Table();
+            tb.add(5);
+            tb.add(6);
+            tb.add(1);
+            tb.delete(6);
+            tb.printTable();
+            Console.WriteLine();
+            //Метод цепочек
+            HashWithChaining h = new HashWithChaining();
+            h.add(7);
+            h.add(8);
+            h.delete(8);
+            h.add(7);
+            h.printTable();
+            Console.ReadLine();
+        }
+    }
+}
