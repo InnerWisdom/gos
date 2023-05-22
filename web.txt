@@ -177,3 +177,80 @@ function dateBuilder (d) {
 
   return `${day} ${date} ${month} ${year}`;
 }
+
+
+
+
+
+=============================================app.js=========================================================
+function fetchData(url) {
+  return fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      return data;
+    });
+}
+
+function formatDate(date) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+  return date.toLocaleDateString('en-US', options);
+}
+
+function createTemperatureElement(date, temp) {
+  const temperatureElement = document.createElement('div');
+  const dateElement = document.createElement('div');
+  const tempElement = document.createElement('div');
+
+  dateElement.textContent = formatDate(date);
+  tempElement.textContent = temp;
+
+  temperatureElement.appendChild(dateElement);
+  temperatureElement.appendChild(tempElement);
+
+  return temperatureElement;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const appElement = document.getElementById('app');
+
+  fetchData('https://api.open-meteo.com/v1/forecast?latitude=54.3&longitude=48.4&hourly=temperature_2m')
+    .then(data => {
+      data.hourly.time.forEach((time, index) => {
+        const date = new Date(time);
+        const temp = data.hourly.temperature_2m[index];
+        const temperatureElement = createTemperatureElement(date, temp);
+        appElement.appendChild(temperatureElement);
+      });
+    });
+});
+=============================================index.html=========================================================
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weather App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="App-header">
+      <img src="logo.svg" class="App-logo" alt="logo">
+      <p>
+        Edit <code>app.js</code> and save to reload.
+      </p>
+    </header>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+=============================================styles.css=========================================================
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
