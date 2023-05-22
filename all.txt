@@ -30,3 +30,5 @@ Lera - https://github.com/D4Gj/gos/raw/sos/lera.txt
 Nickita - https://github.com/D4Gj/gos/raw/sos/nick.txt
 Olga - https://github.com/D4Gj/gos/raw/sos/o.txt
 Kostin - https://github.com/D4Gj/gos/raw/sos/x.txt
+
+https://github.com/KolasikOmetov/Practica
